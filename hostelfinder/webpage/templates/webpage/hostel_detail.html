@@ -1,0 +1,229 @@
+<style>
+    .carousel{
+        height: 250px !important;
+    }
+    /* Make the image fully responsive */
+    .carousel-inner img {
+        width:100%;
+        height:100%;
+        object-fit: cover;
+    }
+    .text-block {
+        background-color: green;
+        color: white;
+        opacity:0.5;
+        text-align:center;
+        font-weight: bold;
+        position:absolute;
+        width:100%;
+        top: 78%;
+    }
+    .infobox{
+        background-color: #FFA500FF;
+        opacity: 0.7;
+        color:white;
+        font-weight:bolder;
+        padding:10px;
+    }
+    .hostel-name{
+        background-color: green;
+        opacity:0.8;
+        color: white;
+        text-align: center;
+        text-transform: uppercase;
+        font-weight:bold;
+        font-size:25px;
+    }
+    .room-available{
+        background-color: green;
+        opacity:0.8;
+        color: white;
+        text-align: center;
+        margin-top: 10px;
+        font-size:25px;
+    }
+    td{
+        vertical-align: top;
+    }
+    .profile-img-box{
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-right: 0 !important;
+        height:200px;
+        width:100%;
+        border:6px solid #FFA500A6;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        object-fit: cover;
+    }
+    iframe{
+        padding-left:0 !important;
+        padding-right:0 !important;
+    }
+    .hotel-rating .fa-star{color: white;}
+    .hotel-rating .rated{color: orange;}
+    .your-hotel-rating .fa-star{color: black;}
+    .your-hotel-rating .rated{color: orange;}
+</style>
+{% extends 'webpage/nav.html' %}
+{% load static %}
+{% block head %}
+{% endblock %}
+{% block body %}
+<div class="container-fluid top-ban">
+    <div class="row">
+        <div class="col-sm-12 col-md-4">
+            <div class="col-sm-12 row" style="margin: 0 !important; padding:0 !important;">
+                <iframe class="col-sm-7" src="http://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q={{hostel.latitude}},{{hostel.longitude}} (custom heading)&amp;output=embed" height="200" frameborder="0" style="border:0" allowfullscreen></iframe>
+                {% with image=hostel.image_set.first %}
+                    {% if image.profile_image %}
+                        <img class="col-sm-5 profile-img-box" src="{{ image.profile_image.url }}" alt="profile image">
+                    {% endif %}
+                {% endwith %}
+                <div class="hotel-rating" style="position:absolute; bottom:10px; right:10px;">
+                    {% with rating=hostel.rating_set.first %}
+                        {% for i in '12345' %}
+                            {% if forloop.counter <= rating.avg %}
+                                <span class="fa fa-star rated" data-rating="{{ forloop.counter }}"></span>
+                            {% else %}
+                                <span class="fa fa-star" data-rating="{{ forloop.counter }}"></span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endwith %}
+                </div>
+            </div>
+            <div class="infobox">
+                 <table class="table-sm">
+                      <tbody style="color:white;">
+                        <tr>
+                          <td>Hostel Type : </td>
+                          <td>{{ hostel.get_hostel_type_display }}</td>
+                        </tr>
+                        <tr>
+                          <td>Contact No : </td>
+                          <td>{{ hostel.hostel_phone }}, {{ hostel.hostel_mobile }}</td>
+                        </tr>
+                        <tr>
+                          <td>Location &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </td>
+                          <td>
+                              {{ hostel.location.district }}, {{ hostel.location.street }}
+                              {% if hostel.additional_location %}
+                                    <br>{{ hostel.additional_location }}
+                              {% endif %}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+            </div>
+             <div class="col-sm-12">
+                    <table class="table table-striped">
+                        <tbody>
+                        {% with fee=hostel.fee_set.first %}
+                            <tr>
+                                <th scope="row">Admission Fee :</th>
+                                <td>{{ fee.admission_fee }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Refundable Fee :</th>
+                                <td>{{ fee.refundable_fee }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Security Fee :</th>
+                                <td>{{ fee.security_fee }}</td>
+                            </tr>
+                        {% endwith %}
+                        </tbody>
+                    </table>
+             </div>
+            {% if username %}
+            <div class="row col-sm-12">
+                <div class="col-sm-6 your-hotel-rating">
+                {% if rating_user or username %}
+                    <h6>Your Rating: </h6>
+                    {% for i in '12345' %}
+                        {% if forloop.counter <= rating_user %}
+                            <a href="{% url 'webpage:rate' hostel.pk forloop.counter %}" ><span class="fa fa-star rated" data-rating="{{ forloop.counter }}"></span></a>
+                        {% else %}
+                            <a href="{% url 'webpage:rate' hostel.pk forloop.counter %}" ><span class="fa fa-star" data-rating="{{ forloop.counter }}"></span></a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                </div>
+                <div class="col-sm-6">
+                    {% if hostel_owner %}
+                        <a href="{% url 'webpage:hostel_edit' hostel.pk %}" style="position:absolute;right:0;bottom:0;">
+                            <button type="button" class="btn btn-info"><i class="far fa-edit"></i>Edit Details</button>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div> <!--col-sm-4 ends here -->
+
+        <!-- col-sm-7 starts-->
+        <div class="col-sm-12 col-md-8">
+            <p class="hostel-name">{{ hostel.hostel_name }}</p>
+            <div id="demo" class="carousel slide" data-ride="carousel">
+                  <ul class="carousel-indicators">
+                    <li data-target="#demo" data-slide-to="0" class="active"></li>
+                    <li data-target="#demo" data-slide-to="1"></li>
+                    <li data-target="#demo" data-slide-to="2"></li>
+                  </ul>
+                {% with image=hostel.image_set.first %}
+                  <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="text-block">
+                            <p>Hostel</p>
+                        </div>
+                        <img src="{% if image.profile_image %}{{ image.profile_image.url }}{% endif %}" alt="Hostel">
+                    </div>
+                    <div class="carousel-item">
+                        <div class="text-block">
+                            <p>Kitchen</p>
+                        </div>
+                        <img src="{% if image.kitchen %}{{image.kitchen.url}}{% endif %}" alt="kitchen" >
+                    </div>
+                    <div class="carousel-item">
+                        <div class="text-block">
+                            <p>Bedroom</p>
+                        </div>
+                        <img src="{% if image.room %}{{ image.room.url }}{% endif %}" alt="bedroom" >
+                    </div>
+                  </div>
+                {% endwith %}
+                  <a class="carousel-control-prev" href="#demo" data-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                  </a>
+                  <a class="carousel-control-next" href="#demo" data-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                  </a>
+            </div> <!-- Image couseral end here -->
+            <p class="room-available">Room Available</p>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Seater</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for room in hostel.room_set.all %}
+                            <tr>
+                                <td>{{ room.seater_type }}</td>
+                                <td>{{ room.quantity }}</td>
+                                <td>{{ room.room_price }}</td>
+                                <td>{{ room.available }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- col-sm-7 ends-->
+    </div>
+</div>
+{% endblock %}

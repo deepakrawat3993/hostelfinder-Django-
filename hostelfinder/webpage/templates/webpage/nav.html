@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostelFinder</title>
+    {% load staticfiles %}
+    {% block head %}
+    {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'webpage/style.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Monoton" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+</head>
+    <body>
+        <nav class="navbar navbar-expand-sm">
+            <div>
+                <span class="navbar-brand logo">HOSTEL FINDER</span>
+            </div>
+            <div class="logger">
+
+                <form class="search-bar-form"  method="GET" action="{% url 'webpage:search_bar'%}" onsubmit="return validate_search_bar();" autocomplete="off">
+                    {% csrf_token %}
+                    <div class="searchbar"">
+                        <input class="search_input" type="text" name="search_value" id="search_value" placeholder="Search...">
+                        <input type="submit" hidden="hidden" id="submit_search">
+                        <a href="#" class="search_icon" id="search_icon"><i class="fas fa-search"></i></a>
+                    </div>
+                    <script>
+                        function validate_search_bar(){
+                            var search = document.getElementById("search_value").value;
+
+                            if(search==""){
+                                alert("please enter the text to search");
+                                return false;
+                            }
+
+                            return true;
+                        }
+
+
+                        var search_icon = document.getElementById("search_icon");
+
+                        search_icon.addEventListener('click',function(){
+                            document.getElementById("submit_search").click();
+                        });
+                    </script>
+                </form>
+
+                {% if username %}
+                <span style="position:relative;top:3px;">Welcome {{username}}</span>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;<a href="{% url 'webpage:logout' %}" style="font-weight:bold;">Log Out</a>
+                {% else %}
+                    <a href="{% url 'webpage:register' %}" style="font-style:italic; font-size:0.9em;">register</a> &nbsp;|&nbsp;
+                    <a href="{% url 'webpage:login' %}" style="font-weight:bold;">Log In</a>
+                {% endif %}
+            </div>
+        </nav>
+        {% block body %}
+        {% endblock %}
+
+        {% include 'webpage/foot_ban.html' %}
+    </body>
+    <script>
+        $( ".logo" ).click(function() {
+            window.location.href="{% url 'webpage:homepage' %}";
+        });
+    </script>
+</html>
